@@ -35,23 +35,10 @@ class BuffHandler(object):
         data["filename"] = self.filename
         self.logs.append(data)
         self.print_logs()
-        #print u"%s | log added: %s (%s) [ %s ]" % (self.buffer_id, data['event_type'], data['filename'], len(self.logs))
 
     def print_logs(self, n=10):
         print u" ".join([ l['event_type'] for l in self.logs[-10:] ])
     
-    #@property
-    #def last_log(self):
-    #    try:
-    #        return self.logs[-1]
-    #    except IndexError:
-    #        return None
-
-    #def remove_last_log(self):
-    #    if self.last_log:
-    #        data = self.logs.pop() 
-    #        print u"%s | log removed: %s (%s) [ %s ]" % (self.buffer_id, data['event_type'], data['filename'], len(self.logs))
-                
     def log(self, event_type, event_data=None):
         data = {
             "dev_id": self.dev_id, "created_at": datetime.datetime.now(), 
@@ -64,9 +51,6 @@ class BuffHandler(object):
         self.filename = filename
         self._apply_temp_log()
 
-    #def on_load(self):
-    #    self.log(event_type="loaded")
-    
     def on_close(self):
         self.log(event_type="closed")
 
@@ -131,8 +115,6 @@ class LogMachine(object):
 
 log_machine = LogMachine(dev_id="test")
 
-from functools import wraps
-
 
 def is_file_buffer(view):
     if not view.window():
@@ -178,10 +160,6 @@ class LogListener(sublime_plugin.EventListener):
         buff, created = log_machine.get_buffer(view.buffer_id(), view.file_name())
         buff.on_deactivated()
     
-    #def on_load(self, view):
-    #    buff, created = log_machine.get_buffer(view.buffer_id(), view.file_name())
-    #    buff.on_load()
-    
     @only_for_file_buffers
     def on_close(self, view):
         buff, created = log_machine.get_buffer(view.buffer_id(), view.file_name())
@@ -196,20 +174,9 @@ class LogListener(sublime_plugin.EventListener):
     def on_modified(self, view):
         buff, created = log_machine.get_buffer(view.buffer_id(), view.file_name())
         buff.on_modified(size=view.size())
-        #print self.last_regions.get(view.id(), None), view.sel_tuples()
-        pass #hello
 
     @only_for_file_buffers
     def on_selection_modified(self, view):
         buff, created = log_machine.get_buffer(view.buffer_id(), view.file_name())
         buff.on_cursor_modified(view.sel_coords())
-        
-        #print view.sel_coords()
-        return 
-        #buff, created = log_machine.get_buffer(view.buffer_id(), view.file_name())
-        
-        #self.last_regions[view.id()] = view.sel_tuples()
-
-        #print view.id(), self.last_regions[view.id()]    
-        
                  
